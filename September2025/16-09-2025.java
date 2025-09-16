@@ -2,27 +2,31 @@
 // 2197. Replace Non-Coprime Numbers in Array
 
 class Solution {
-    public int evaluate(String[] arr) {
-        Deque<Integer> operands = new ArrayDeque<>();
-        int num1 = 0, num2 = 0;
-        for(String el : arr){
-            if(el.equals("+") || el.equals("-") || el.equals("*") || el.equals("/")){
-                num2 = operands.pop();
-                num1 = operands.pop();
+    public List<Integer> replaceNonCoprimes(int[] nums) {
+        
+         int n = nums.length;
+         int[] stack = new int[n];
+         int top = -1;
+
+         for(int num:nums){
+
+            while(top != -1){
+              int x = gcd(stack[top], num);
+              if(x == 1) break;
+              num *= stack[top--]/x;
             }
-            if(el.equals("+")){
-                operands.push(num1 + num2);
-            }else if(el.equals("-")){
-                operands.push(num1 - num2);
-            }else if(el.equals("*")){
-                operands.push(num1 * num2);
-            }else if(el.equals("/")){
-                operands.push(num1 / num2);
-            }else{
-                operands.push(Integer.parseInt(el));
-            }
+
+            stack[++top] = num;
         }
         
-        return operands.peek();
+        List<Integer> result = new ArrayList<Integer>(top + 1);
+        for(int i = 0; i <= top; ++i)
+            result.add(stack[i]);
+        
+        return result;
+    }
+    
+    public int gcd(int a, int b){
+        return b == 0 ? a: gcd(b, a % b);
     }
 }
