@@ -1,21 +1,53 @@
-// Bus Conductor
-// Difficulty: EasyAccuracy: 75.3%Submissions: 27K+Points: 2
-// You are conductor of a bus. You are given two arrays chairs[] and passengers[] of equal length, where chairs[i] is the position of the ith chair and passengers[j] is the position of the jth passenger. You may perform the following move any number of times:
-
-// Increase or decrease the position of the ith passenger by 1 (i.e., moving the ith passenger from position x to x+1 or x-1)
-// Return the minimum number of moves required to move each passenger to get a chair.
-// Note: Although multiple chairs can occupy the same position, each passenger must be assigned to exactly one unique chair.
+// 2092. Find All People With Secret
 
 
 class Solution {
-    public int findMoves(int[] chairs, int[] passengers) {
-        Arrays.sort(chairs);
-        Arrays.sort(passengers);
-        int result=0;
-        for(int i=0;i<chairs.length;i++){
-            result+=Math.abs(chairs[i]-passengers[i]);
-        }
-        return result;
+    public List<Integer> findAllPeople(int n, int[][] meetings, int firstPerson) {
+        Arrays.sort(meetings, (a, b) -> a[2] - b[2]);
 
+        int[] parent = new int[n];
+        boolean[] know = new boolean[n];
+        for (int i = 0; i < n; i++) parent[i] = i;
+
+        know[0] = know[firstPerson] = true;
+
+        for (int i = 0; i < meetings.length; ) {
+            int t = meetings[i][2];
+            List<Integer> list = new ArrayList<>();
+
+            int j = i;
+            while (j < meetings.length && meetings[j][2] == t) {
+                union(meetings[j][0], meetings[j][1], parent);
+                list.add(meetings[j][0]);
+                list.add(meetings[j][1]);
+                j++;
+            }
+
+            for (int p : list)
+                if (know[p])
+                    know[find(p, parent)] = true;
+
+            for (int p : list)
+                know[p] |= know[find(p, parent)];
+
+            for (int p : list)
+                parent[p] = p;
+
+            i = j;
+        }
+
+        List<Integer> res = new ArrayList<>();
+        for (int i = 0; i < n; i++)
+            if (know[i]) res.add(i);
+        return res;
+    }
+
+    private int find(int x, int[] p) {
+        return p[x] == x ? x : (p[x] = find(p[x], p));
+    }
+
+    private void union(int a, int b, int[] p) {
+        int pa = find(a, p), pb = find(b, p);
+        if (pa != pb) p[pb] = pa;
     }
 }
