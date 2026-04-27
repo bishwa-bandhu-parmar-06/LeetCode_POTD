@@ -1,47 +1,38 @@
-// 1559. Detect Cycles in 2D Grid
+// 1391. Check if There is a Valid Path in a Grid
 
 
 
 
 class Solution {
-    public boolean containsCycle(char[][] grid) {
-        int row[] = { 1, -1, 0, 0 };
-        int col[] = { 0, 0, 1, -1 };
-        int n = grid.length;
-        int m = grid[0].length;
-        boolean[][] isVisited = new boolean[n][m];
+    int[][][] moves = new int[][][]{{}, {{0, 1}, {0, -1}}, {{1, 0}, {-1, 0}}, {{0, -1}, {1, 0}}, {{0, 1}, {1, 0}}, {{0, -1}, {-1, 0}}, {{0, 1}, {-1, 0}}};
 
-        Queue<int[]> queue = new LinkedList<>();
+    public boolean hasValidPath(int[][] grid) {
+        int m = grid.length, n = grid[0].length;
+        boolean[][] visited = new boolean[m][n];
+        Deque<int[]> q = new ArrayDeque<>();
 
-        for (int k = 0; k < n; k++) {
-            for (int z = 0; z < m; z++) {
-                if (!isVisited[k][z]) {
-                    queue.add(new int[]{k,z,-1,-1});
-                    isVisited[k][z]= true;
-                    while (!queue.isEmpty()) {
-                        int[] co = queue.poll();
-                        char c = grid[co[0]][co[1]];
-                        String last = co[2] + "#" + co[3];
-                        for (int i = 0; i < 4; i++) {
-                            int x = co[0] + row[i];
-                            int y = co[1] + col[i];
-                            String ne = x + "#" + y;
-                            if (!ne.equals(last) &&
-                                    x >= 0 && x < n && y >= 0 && y < m &&
-                                    !isVisited[x][y] && c == grid[x][y]) {
-                                queue.add(new int[] { x, y, co[0], co[1] });
-                                isVisited[x][y] = true;
-                            } else if (!ne.equals(last) &&
-                                    x >= 0 && x < n && y >= 0 && y < m &&
-                                    isVisited[x][y] && c == grid[x][y]) {
-                                return true;
-                            }
+        q.addLast(new int[]{0, 0});
+        visited[0][0] = true;
 
+        while (!q.isEmpty()) {
+            int[] cur = q.removeFirst();
+            int i = cur[0], j = cur[1];
+            if (i == m - 1 && j == n - 1) return true;
+            for (int[] move : moves[grid[i][j]]) {
+                int _i = i + move[0];
+                int _j = j + move[1];
+
+                if (_i >= 0 && _i < m && _j >= 0 && _j < n && !visited[_i][_j]) {
+                    for (int[] back : moves[grid[_i][_j]]) {
+                        if (_i + back[0] == i && _j + back[1] == j) {
+                            visited[_i][_j] = true;
+                            q.offer(new int[]{_i, _j});
                         }
                     }
                 }
             }
         }
+
         return false;
     }
 }
