@@ -1,6 +1,6 @@
 
 
-// 1840. Maximum Building Height
+# // 1840. Maximum Building Height
 
 class Solution:
     def maxBuilding(self, n: int, restrictions: List[List[int]]) -> int:
